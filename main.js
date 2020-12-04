@@ -256,9 +256,9 @@ async function master() {
             });
         });
 
+        const text = fs.readFileSync(req.body.filename, 'utf8');
         const chunk_size = req.body.chunk ? parseInt(req.body.chunk) : 512 * 1024;
-        const text = fs.readFileSync(req.body.filename, 'utf8').substr(0, chunk_size);
-        let mapper_chunk_size = parseInt(text.length / 3);
+        let mapper_chunk_size = parseInt(text.length / mapperIps.length);
         console.log("text length: " + text.length);
         console.log("chunk size: " + mapper_chunk_size);
 
@@ -318,37 +318,37 @@ async function master() {
             fs.appendFileSync("output", `top 5% words\n\n`);
             for (let i = 0; i <= 0.05 * sorted_words.length; i++) {
                 let [word, freq] = sorted_words[i];
-                fs.appendFileSync("output", `word: ${word}, frequency: ${freq}\n`);
+                fs.appendFileSync("output", `rank: ${i}, word: ${word}, frequency: ${freq}\n`);
             }
 
             fs.appendFileSync("output", `47.5% - 52.5% words\n\n`);
             for (let i = parseInt(0.475 * sorted_words.length + 1); i <= 0.525 * sorted_words.length; i++) {
                 let [word, freq] = sorted_words[i];
-                fs.appendFileSync("output", `word: ${word}, frequency: ${freq}\n`);
+                fs.appendFileSync("output", `rank: ${i}, word: ${word}, frequency: ${freq}\n`);
             }
 
             fs.appendFileSync("output", `bottom 5% words\n\n`);
             for (let i = parseInt(0.95 * sorted_words.length + 1); i < sorted_words.length; i++) {
                 let [word, freq] = sorted_words[i];
-                fs.appendFileSync("output", `word: ${word}, frequency: ${freq}\n`);
+                fs.appendFileSync("output", `rank: ${i}, word: ${word}, frequency: ${freq}\n`);
             }
 
             fs.appendFileSync("output", `top 5% letters\n\n`);
             for (let i = 0; i <= 0.05 * sorted_letters.length; i++) {
                 let [letter, freq] = sorted_letters[i];
-                fs.appendFileSync("output", `letter: ${letter}, frequency: ${freq}\n`);
+                fs.appendFileSync("output", `rank: ${i}, letter: ${letter}, frequency: ${freq}\n`);
             }
 
             fs.appendFileSync("output", `47.5% - 52.5% letters\n\n`);
             for (let i = parseInt(0.475 * sorted_letters.length + 1); i <= 0.525 * sorted_letters.length; i++) {
                 let [letter, freq] = sorted_letters[i];
-                fs.appendFileSync("output", `letter: ${letter}, frequency: ${freq}\n`);
+                fs.appendFileSync("output", `rank: ${i}, letter: ${letter}, frequency: ${freq}\n`);
             }
 
             fs.appendFileSync("output", `bottom 5% letters\n\n`);
             for (let i = parseInt(0.95 * sorted_letters.length + 1); i < sorted_letters.length; i++) {
                 let [letter, freq] = sorted_letters[i];
-                fs.appendFileSync("output", `letter: ${letter}, frequency: ${freq}\n`);
+                fs.appendFileSync("output", `rank: ${i}, letter: ${letter}, frequency: ${freq}\n`);
             }
         }
         res.send("result get OK");
