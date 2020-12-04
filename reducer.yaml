@@ -29,7 +29,7 @@ spec:
     spec:
       containers:
       - name: mapreduce
-        image: gcr.io/buoyant-apogee-295608/mapreduce
+        image: gcr.io/psychic-ruler-295605/mapreduce
         ports:
         - containerPort: 8080
           name: reducer

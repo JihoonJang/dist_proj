@@ -20,7 +20,7 @@ metadata:
 spec:
   containers:
   - name: master
-    image: gcr.io/buoyant-apogee-295608/mapreduce
+    image: gcr.io/psychic-ruler-295605/mapreduce
     ports:
     - containerPort: 8080
       name: mapper

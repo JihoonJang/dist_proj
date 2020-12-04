@@ -30,7 +30,7 @@ String.prototype.isalpha = function(i) {
 main();
 
 function main() {
-    console.log(process.env.TYPE);
+    // console.log(process.env.TYPE);
     switch(process.env.TYPE) {
         case "MAPPER":
             mapper();
@@ -47,7 +47,7 @@ function main() {
 function mapper() {
     app.post('/mapper', function(req, res) {
         const {str, reducerIps, mapper_length, masterIp} = req.body;
-        console.log("mapper get post");
+        // console.log("mapper get post");
         let words = [];
         let letters = [];
         for (let i = 0; i < reducerIps.length; i++) {
@@ -77,8 +77,8 @@ function mapper() {
                 letters[idx][c]++;
             }
         }
-        console.log(words);
-        console.log(letters);
+        // console.log(words);
+        // console.log(letters);
 
         for (let i = 0; i < reducerIps.length; i++) {
             let reducerIp = reducerIps[i];
@@ -103,7 +103,7 @@ function mapper() {
             let post_req = http.request(post_options, function(res) {
                 res.setEncoding('utf8');
                 res.on('data', function (chunk) {
-                    console.log('Response: ' + chunk);
+                    // console.log('Response: ' + chunk);
                 });
             });
 
@@ -114,7 +114,7 @@ function mapper() {
         res.send("mapper get OK");
     });
 
-    app.listen(port, () => console.log(`listening on port ${port} at mapper`));
+    app.listen(port, () => // console.log(`listening on port ${port} at mapper`));
 }
 
 async function reducer() {
@@ -172,7 +172,7 @@ async function reducer() {
             let post_req = http.request(post_options, function(res) {
                 res.setEncoding('utf8');
                 res.on('data', function (chunk) {
-                    console.log('Response: ' + chunk);
+                    // console.log('Response: ' + chunk);
                 });
             });
 
@@ -184,7 +184,7 @@ async function reducer() {
         res.send("reducer get OK");
     });
 
-    app.listen(port, () => console.log(`listening on port ${port} at reducer`));
+    app.listen(port, () => // console.log(`listening on port ${port} at reducer`));
 }
 
 async function init(reducerIps) {
@@ -207,7 +207,7 @@ async function init(reducerIps) {
         let post_req = http.request(post_options, function(res) {
             res.setEncoding('utf8');
             res.on('data', function (chunk) {
-                console.log('Response: ' + chunk);
+                // console.log('Response: ' + chunk);
             });
         });
 
@@ -257,20 +257,20 @@ async function master() {
         });
 
         const text = fs.readFileSync(req.body.filename, 'utf8');
-        const chunk_size = req.body.chunk ? parseInt(req.body.chunk) : 512 * 1024;
-        let mapper_chunk_size = parseInt(text.length / mapperIps.length);
-        console.log("text length: " + text.length);
-        console.log("chunk size: " + mapper_chunk_size);
+        let chunk_size = req.body.chunk ? parseInt(req.body.chunk) : 1024;
+        // console.log("text length: " + text.length);
+        // console.log("chunk size: " + chunk_size);
 
         let start_idx = 0;
+        let mapper_length = parseInt(text.length / chunk_size) + (text.length % chunk_size ? 1 : 0);
 
-        for (let i = 0; i < mapperIps.length; i++) {
-            let mapperIp = mapperIps[i];
-            if (i === mapperIps.length - 1) mapper_chunk_size = text.length;
+        for (let i = 0; i < mapper_length; i++) {
+            let mapperIp = mapperIps[i % mapperIps.length];
+            if (i === mapperIps.length - 1) chunk_size = text.length;
             let post_data = querystring.stringify({
-                str: text.substr(start_idx, mapper_chunk_size),
+                str: text.substr(start_idx, chunk_size),
                 reducerIps,
-                mapper_length: mapperIps.length,
+                mapper_length,
                 masterIp,
             });
 
@@ -288,14 +288,14 @@ async function master() {
             let post_req = http.request(post_options, function(res) {
                 res.setEncoding('utf8');
                 res.on('data', function (chunk) {
-                    console.log('Response: ' + chunk);
+                    // console.log('Response: ' + chunk);
                 });
             });
 
             // post the data
             post_req.write(post_data);
             post_req.end();
-            start_idx = Math.min(text.length - 1, start_idx + mapper_chunk_size);
+            start_idx = Math.min(text.length - 1, start_idx + chunk_size);
         }
         res.send("chunk sended OK");
     });
@@ -354,5 +354,5 @@ async function master() {
         res.send("result get OK");
     });
 
-    app.listen(port, () => console.log(`listening on port ${port} at master`));
+    app.listen(port, () => // console.log(`listening on port ${port} at master`));
 }
